@@ -1,0 +1,32 @@
+DROP TABLE IF EXISTS logs;
+CREATE TABLE logs (
+	table_name VARCHAR(100) NOT NULL,
+	id BIGINT NOT NULL,
+	item_name VARCHAR(255) NOT NULL,
+	created_at DATETIME NOT NULL DEFAULT NOW()
+) ENGINE=Archive;
+
+
+DROP TRIGGER IF EXISTS users_insert;
+CREATE TRIGGER users_insert AFTER INSERT ON users
+FOR EACH ROW 
+BEGIN
+	INSERT INTO logs VALUES ('users', LAST_INSERT_ID(), (SELECT name FROM users WHERE id = LAST_INSERT_ID()), (SELECT created_at FROM users WHERE id = LAST_INSERT_ID()));
+END;
+
+
+
+DROP TRIGGER IF EXISTS catalogs_insert;
+CREATE TRIGGER catalogs_insert AFTER INSERT ON catalogs
+FOR EACH ROW 
+BEGIN
+	INSERT INTO logs VALUES ('catalogs', LAST_INSERT_ID(), (SELECT name FROM catalogs WHERE id = LAST_INSERT_ID()), (SELECT created_at FROM catalogs WHERE id = LAST_INSERT_ID()));
+END;
+
+
+DROP TRIGGER IF EXISTS products_insert;
+CREATE TRIGGER products_insert AFTER INSERT ON products
+FOR EACH ROW 
+BEGIN
+	INSERT INTO logs VALUES ('products', LAST_INSERT_ID(), (SELECT name FROM products WHERE id = LAST_INSERT_ID()), (SELECT created_at FROM products WHERE id = LAST_INSERT_ID()));
+END;
